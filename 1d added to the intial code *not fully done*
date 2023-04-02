@@ -1,0 +1,423 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAXX 1024
+#define SIZE 50
+
+struct origdata {
+  // define placeholders for 18 columns of data
+
+  int ref_date;
+  char geo[SIZE];
+  char DGUID[SIZE];
+  char age_group[SIZE];
+  char sex[SIZE];
+  char indicator[SIZE], characteristic[SIZE], UOM[SIZE];
+  int UOMid;
+  char scalar_factor[SIZE];
+  int scalarID;
+  char vector[SIZE], coordinate[SIZE];
+  double percent;
+  char status, symbol, terminate;
+  int decimal;
+};
+
+struct dataset {
+  // define variables for the 5 columns of data we will work with
+
+  int ref_date;
+  char geo[SIZE];
+  char age_group[SIZE];
+  char sex[SIZE];
+  double percent;
+};
+
+int main(void) {
+  FILE *sheet = fopen("statscan_diabetes.txt", "r");
+  FILE *sheet2 = fopen("statscan_diabetes.txt", "r");
+  char line[MAXX];
+  char line2[MAXX];
+  char *token;
+  struct origdata alldata;
+  struct dataset data;
+  
+  double province_sum_35_49[4] = {0};
+  double province_sum_60_64[4] = {0};
+  double province_sum_65plus[4] = {0};
+  double province_count[4] = {0};
+  double country_sum_35_49 ;
+  double country_sum_60_64 ;
+  double country_sum_65plus ;
+  double country_count ;
+  int province_index;
+
+
+  if (sheet == NULL) {
+    printf(" error opening file\n");
+    return 1;
+  }
+
+  fgets(line, MAXX,
+        sheet); //// declare arrays with how many rows in first sheet
+  int row = 0;
+
+  while (fgets(line, MAXX, sheet)) {
+
+    token = strtok(line, "\",\"");
+    if (!token || !token[0])
+      continue;
+    alldata.ref_date = atoi(token);
+    data.ref_date = atoi(token); // relevant column 1
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.geo, token);
+    strcpy(data.geo, token); // relevant column 2
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.DGUID, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.age_group, token);
+    strcpy(data.age_group, token); // relevant column 4
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.sex, token);
+    strcpy(data.sex, token); // relevant column 5
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.indicator, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.characteristic, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.UOM, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.UOMid = atoi(token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.scalar_factor, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.scalarID = atoi(token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.vector, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.coordinate, token);
+
+    token = strtok(NULL, ",\"");
+    if (!token || !token[0])
+      continue;
+    alldata.percent = atof(token);
+    data.percent = atof(token); // relevant column 14
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.status = token[0];
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.symbol = token[0];
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.terminate = token[0];
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.decimal = atoi(token);
+
+    row++;
+  }
+
+  struct dataset array[row]; // now we work with sheet 2
+  int counter = 0;
+  fgets(line, MAXX, sheet2);
+
+  while (fgets(line, MAXX, sheet2)) {
+
+    token = strtok(line, "\",\"");
+    if (!token || !token[0])
+      continue;
+    alldata.ref_date = atoi(token);
+    data.ref_date = atoi(token); // relevant column 1
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.geo, token);
+    strcpy(data.geo, token); // relevant column 2
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.DGUID, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.age_group, token);
+    strcpy(data.age_group, token); // relevant column 4
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.sex, token);
+    strcpy(data.sex, token); // relevant column 5
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.indicator, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.characteristic, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.UOM, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.UOMid = atoi(token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.scalar_factor, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.scalarID = atoi(token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.vector, token);
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    strcpy(alldata.coordinate, token);
+
+    token = strtok(NULL, ",\"");
+    if (!token || !token[0])
+      continue;
+    alldata.percent = atof(token);
+    data.percent = atof(token); // relevant column 14
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.status = token[0];
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.symbol = token[0];
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.terminate = token[0];
+
+    token = strtok(NULL, ",");
+    if (!token || !token[0])
+      continue;
+    alldata.decimal = atoi(token);
+
+    array[counter] = data;
+
+    counter++;
+  }
+
+  /*//Print the values as separate columns
+      printf("Ref Date, Geo, Age Group, Sex, Value\n");
+        for (int i = 0; i< row; i++){
+      printf("%d %s %s %s %.3lf\n", array[i].ref_date, array[i].geo,
+     array[i].sex, array[i].age_group, array[i].percent/100);
+     }
+     */
+     
+    if (strcmp(alldata.age_group, "35 to 49 years") == 0) {
+        
+        province_sum_35_49[province_index] += alldata.percent;
+  country_sum_35_49 += alldata.percent;
+  province_count[province_index]++;
+  country_count++;
+    }
+    
+    
+
+
+  printf("\nQuestion 1: Let's determine what percentage of the population was "
+         "diagnosed with diabetes.\n\n");
+  double totavg = 0;
+  int totcount = 0;
+  double yearavg[7] = {0}; // 2015 to 2021
+  int yearcount[7] = {0};
+
+  // CANADA AVG
+  for (int i = 0; i < row + 1; i++) {
+    if (!strcmp(array[i].geo, "\"Canada (excluding territories)\"")) {
+      // Total average
+      totavg += array[i].percent;
+      totcount++;
+
+      // Yearly average
+      int yr = array[i].ref_date - 2015; // year index
+      yearavg[yr] += array[i].percent;
+      yearcount[yr]++;
+    }
+  } // Print CANADA RESULTS
+  printf("\nb) Canada Total average: %.2lf\n", totavg / totcount);
+  printf("\nc) Canada Yearly average\n_______________\n");
+  for (int i = 0; i < 7; i++) {
+    int year = i + 2015;
+    printf("%d avg: %.2lf\n", year, yearavg[i] / yearcount[i]);
+  }
+
+  // end
+  // QUEBEC AVG
+  for (int i = 0; i < row + 1; i++) {
+    if (!strcmp(array[i].geo, "\"Quebec\"")) {
+      // Total average
+      totavg += array[i].percent;
+      totcount++;
+
+      // Yearly average
+      int yr = array[i].ref_date - 2015; // year index
+      yearavg[yr] += array[i].percent;
+      yearcount[yr]++;
+    }
+  } // Print QUEBEC RESULTS
+  printf("\na) Quebec Total average: %.2lf\n", totavg / totcount);
+  printf("\nc) Quebec Yearly average\n_______________\n");
+  for (int i = 0; i < 7; i++) {
+    int year = i + 2015;
+    printf("%d avg: %.2lf\n", year, yearavg[i] / yearcount[i]);
+  }
+
+  // ONTARIO AVG
+
+  for (int i = 0; i < row + 1; i++) {
+    if (!strcmp(array[i].geo, "\"Ontario\"")) {
+      // Total average
+      totavg += array[i].percent;
+      totcount++;
+
+      // Yearly average
+      int yr = array[i].ref_date - 2015; // year index
+      yearavg[yr] += array[i].percent;
+      yearcount[yr]++;
+    }
+  } // Print ONTARIO RESULTS
+  printf("\na) Ontario Total average: %.2lf\n", totavg / totcount);
+  printf("\nc) Ontario Yearly average\n_______________\n");
+  for (int i = 0; i < 7; i++) {
+    int year = i + 2015;
+    printf("%d avg: %.2lf\n", year, yearavg[i] / yearcount[i]);
+  }
+
+  // ALBERTA AVG
+  for (int i = 0; i < row + 1; i++) {
+    if (!strcmp(array[i].geo, "\"Alberta\"")) {
+      // Total average
+      totavg += array[i].percent;
+      totcount++;
+
+      // Yearly average
+      int yr = array[i].ref_date - 2015; // year index
+      yearavg[yr] += array[i].percent;
+      yearcount[yr]++;
+    }
+  } // Print ALBERTA RESULTS
+  printf("\na) Alberta Total average: %.2lf\n", totavg / totcount);
+  printf("\nc) Alberta Yearly average\n_______________\n");
+  for (int i = 0; i < 7; i++) {
+    int year = i + 2015;
+    printf("%d avg: %.2lf\n", year, yearavg[i] / yearcount[i]);
+  }
+
+  // BRITISH COLUMBIA AVG
+
+  for (int i = 0; i < row + 1; i++) {
+    if (!strcmp(array[i].geo, "\"British Columbia\"")) {
+      // Total average
+      totavg += array[i].percent;
+      totcount++;
+
+      // Yearly average
+      int yr = array[i].ref_date - 2015; // year index
+      yearavg[yr] += array[i].percent;
+      yearcount[yr]++;
+    }
+  } // Print BC RESULTS
+  printf("\na) BC Total average: %.2lf\n", totavg / totcount);
+  printf("\nc) BC Yearly average\n_______________\n");
+  for (int i = 0; i < 7; i++) {
+    int year = i + 2015;
+    printf("%d avg: %.2lf\n", year, yearavg[i] / yearcount[i]);
+  }
+
+  printf("\nMissing: 1. d) Percentage for age_groups.\n");
+
+  printf("\nMissing: 2) Province with lowest and highest percentage.\n");
+
+  printf("\nMissing: 3) Province with above anf below Canada's Average.\n");
+
+  printf("\nMissing: 4) Year+Province with lowest and highest percentage.\n");
+  
+  printf("\nAverage diabetes percentage by age group:\n");
+
+for (int i = 0; i < 4; i++) {
+  double avg_35_49 = province_sum_35_49[i] / province_count[i];
+  double avg_60_64 = province_sum_60_64[i] / province_count[i];
+  double avg_65plus = province_sum_65plus[i] / province_count[i];
+  printf("Province %d: 35-49 years: %.2lf%%, 60-64 years: %.2lf%%, 65+ years: %.2lf%%\n", i+1, avg_35_49, avg_60_64, avg_65plus);
+}
+
+double country_avg_35_49 = country_sum_35_49 / country_count;
+double country_avg_60_64 = country_sum_60_64 / country_count;
+double country_avg_65plus = country_sum_65plus / country_count;
+printf("Canada (excluding territories): 35-49 years: %.2lf%%, 60-64 years: %.2lf%%, 65+ years: %.2lf%%\n", country_avg_35_49, country_avg_60_64, country_avg_65plus);
+
+
+  return 0;
+}
